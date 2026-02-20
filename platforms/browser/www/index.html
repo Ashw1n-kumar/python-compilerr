@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PyAsh - Modern Python IDE</title>
+    <!-- Modern Typeface: Outfit for display, Fira Code for Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Load Pyodide locally -->
+    <script src="pyodide/pyodide.js"></script>
+</head>
+
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-shell anim-fade-in">
+        <header class="top-nav">
+            <div class="brand">
+                <img src="img/python.webp" alt="ashiwn Logo" class="app-logo">
+                <h2>PyAsh</h2>
+            </div>
+
+            <div id="engine-status" class="engine-badge loading">
+                <div class="shimmer"></div>
+                <span class="dot"></span>
+                <span class="status-text">Booting Engine</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="editor-glass anim-slide-up">
+                <div class="editor-header">
+                    <div class="file-name">
+                        <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L4 5v14l8 3 8-3V5l-8-3zm0 2.2l6 2.2V18l-6 2.2-6-2.2V6.4l6-2.2z" />
+                        </svg>
+                        <span>main.py</span>
+                    </div>
+                    <div class="editor-actions">
+                        <button id="btn-clear" class="icon-btn" title="Clear All">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-body">
+                    <div id="line-numbers" class="line-numbers">1</div>
+                    <textarea id="code-editor" spellcheck="false" placeholder="Write your python code here..."># PyAsh Offline IDE
+# Example with User Input:
+name = input("Enter your name: ")
+age = input("Enter your age: ")
+
+print(f"\n✨ Hello {name}!")
+print(f"You are {age} years young.")
+print("Welcome to the aesthetic Python world.")
+</textarea>
+                </div>
+            </div>
+
+            <div id="output-panel" class="output-panel">
+                <div class="panel-header">
+                    <h3>CONSOLE</h3>
+                    <div class="header-right">
+                        <button id="btn-clear-output" class="text-link">Clear Log</button>
+                        <button id="btn-close-output" class="text-link close-console">Close</button>
+                    </div>
+                </div>
+                <div id="output-terminal" class="console">
+                    <div class="log-entry system">Initializing high-performance runtime...</div>
+                </div>
+                <div id="stdin-area" class="stdin-container">
+                    <div class="stdin-prompt">INPUT REQUIRED:</div>
+                    <input type="text" id="stdin-field" placeholder="Type here and press Enter..." autocomplete="off">
+                </div>
+            </div>
+        </main>
+
+        <footer class="bottom-bar anim-slide-up" style="animation-delay: 0.2s;">
+            <button id="btn-run" class="run-button" disabled>
+                <div class="btn-content">
+                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <span>EXECUTE CODE</span>
+                </div>
+                <div class="btn-glow"></div>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Notification system -->
+    <div id="toast-container"></div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

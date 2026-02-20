@@ -1,0 +1,1005 @@
+:root {
+    --bg-main: #f0f4f8;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --accent: #6366f1;
+    /* Indigo accent */
+    --accent-light: #818cf8;
+    --accent-glow: rgba(99, 102, 241, 0.25);
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --editor-bg: #ffffff;
+    --console-bg: #1e293b;
+    --console-text: #e2e8f0;
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --drawer-bg: #ffffff;
+}
+
+/* Dark theme overrides */
+.dark-theme {
+    --bg-main: #071023;
+    --glass-bg: rgba(10, 18, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.04);
+    --text-primary: #e6eef8;
+    --text-secondary: #9fb6d8;
+    --accent: #7c5cff;
+    --accent-light: #9b86ff;
+    --accent-glow: rgba(124, 92, 255, 0.18);
+    --editor-bg: #06111a;
+    --console-bg: #02121a;
+    --console-text: #cfeef0;
+    --drawer-bg: #071323;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* Dynamic Mesh Background */
+.glass-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.1) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.1) 0px, transparent 50%);
+    background-color: var(--bg-main);
+}
+
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 16px;
+    gap: 16px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Animations */
+.anim-fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.anim-slide-up {
+    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    transition: opacity 0.3s ease;
+}
+
+.app-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px var(--accent-glow));
+}
+
+.logo-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-btn.swipe-feedback {
+    transform: translateY(20px) scale(1.1);
+}
+
+/* Drawer actions (shown inside sliding drawer) */
+.drawer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.drawer-actions .text-link {
+    display: block;
+    text-align: left;
+    padding: 8px 10px;
+    background: transparent;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.drawer-actions .text-link:hover {
+    background: rgba(99, 102, 241, 0.04)
+}
+
+/* File Drawer */
+.file-drawer {
+    position: fixed;
+    left: -340px;
+    top: 0;
+    height: 100%;
+    width: 340px;
+    background: var(--drawer-bg);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
+    border-right: 1px solid var(--glass-border);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    padding: 18px;
+}
+
+.file-drawer.open {
+    left: 0;
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.drawer-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: none;
+}
+
+.file-drawer.list-visible .drawer-list {
+    display: block;
+}
+
+.drawer-list .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.drawer-list .file-item:hover {
+    background: rgba(99, 102, 241, 0.06);
+}
+
+.drawer-list .file-name {
+    font-family: 'Fira Code', monospace;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.drawer-preview {
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    padding-top: 12px;
+}
+
+/* Hide filename initially; shown after save/load */
+#current-filename {
+    display: none;
+    font-family: 'Fira Code', monospace;
+    font-weight: 800;
+    color: var(--text-secondary);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-code {
+    max-height: 220px;
+    overflow: auto;
+    background: var(--editor-bg);
+    color: var(--text-primary);
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    margin-top: 8px;
+    white-space: pre-wrap;
+}
+
+.script-buttons button {
+    margin-left: 6px
+}
+
+/* Script save control styling */
+.script-controls {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(99, 102, 241, 0.04);
+    padding: 6px;
+    border-radius: 999px;
+}
+
+.script-controls input {
+    border: none;
+    outline: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    width: 160px;
+    flex: 0 0 160px;
+    background: white;
+    color: var(--text-primary);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.06);
+}
+
+/* Dark-mode override for the save input to keep text readable */
+.dark-theme .script-controls input {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+.dark-theme .script-controls input::placeholder {
+    color: rgba(230, 238, 248, 0.4);
+}
+
+.script-controls .save-btn,
+.save-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.script-controls .save-btn:hover {
+    opacity: 0.95
+}
+
+.preview-actions {
+    display: none;
+    gap: 8px;
+}
+
+.preview-actions .text-link {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 6px 8px;
+    border-radius: 8px;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.preview-actions .text-link:hover {
+    background: rgba(99, 102, 241, 0.04)
+}
+
+/* Ensure preview action buttons align and have consistent height */
+.preview-actions button,
+.preview-actions .text-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    padding: 6px 10px;
+}
+
+/* Editor actions container tweaks to avoid overflow */
+.editor-header .editor-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Delete button styling */
+#preview-delete {
+    color: var(--error);
+    border-color: rgba(239, 68, 68, 0.12);
+}
+
+#preview-delete:hover {
+    background: rgba(239, 68, 68, 0.06)
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.brand h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    transition: opacity 0.3s ease;
+}
+
+.engine-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+}
+
+.engine-badge.loading .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--warning);
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.engine-badge.ready .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--success);
+}
+
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Main Content Layout */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+}
+
+/* Editor Glass */
+.editor-glass {
+    flex: 1.4;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+.editor-header {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+}
+
+.file-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.file-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--accent);
+}
+
+.editor-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.editor-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#code-editor,
+#highlight-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#code-editor {
+    z-index: 2;
+    background: transparent;
+    color: transparent;
+    /* Text transparent, caret visible */
+    caret-color: var(--text-primary);
+    resize: none;
+}
+
+#highlight-layer {
+    z-index: 1;
+    background: transparent;
+    color: var(--text-primary);
+    pointer-events: none;
+    /* Let clicks pass through to textarea */
+}
+
+/* Syntax Highlighting Colors */
+.hl-keyword {
+    color: #c678dd;
+    font-weight: 600;
+}
+
+/* Purple */
+.hl-func {
+    color: #61afef;
+}
+
+/* Blue */
+.hl-string {
+    color: #98c379;
+}
+
+/* Green */
+.hl-comment {
+    color: #5c6370;
+    font-style: italic;
+}
+
+/* Grey */
+.hl-type {
+    color: #e5c07b;
+}
+
+/* Yellow/Orange */
+.hl-number {
+    color: #d19a66;
+}
+
+/* Orange */
+.hl-operator {
+    color: #56b6c2;
+}
+
+/* Cyan */
+.hl-val {
+    color: #d19a66;
+}
+
+/* Value/Const */
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: none;
+    /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--drawer-bg);
+    width: 90%;
+    max-width: 600px;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.snippet-card {
+    background: rgba(99, 102, 241, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.snippet-card:hover {
+    background: rgba(99, 102, 241, 0.08);
+    transform: translateY(-2px);
+}
+
+.snippet-name {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+}
+
+.snippet-code {
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: block;
+    white-space: pre-wrap;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* Console Panel */
+.output-panel {
+    display: none;
+    /* Hidden by default */
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    height: 0;
+    overflow: hidden;
+}
+
+.output-panel.visible {
+    display: flex;
+    height: auto;
+    animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Forcefully hide the console when user closes it */
+.output-panel.hidden {
+    display: none !important;
+    height: 0 !important;
+}
+
+/* When console is shown as full view, hide the editor and expand console */
+.app-shell.show-console .editor-glass {
+    display: none;
+}
+
+.app-shell.show-console .output-panel {
+    display: flex !important;
+    height: calc(100vh - 80px) !important;
+    flex-direction: column;
+}
+
+.app-shell.show-console .bottom-bar {
+    display: none;
+}
+
+.header-right {
+    display: flex;
+    gap: 12px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+}
+
+.text-link {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.text-link:hover {
+    opacity: 0.7;
+}
+
+.close-console {
+    color: var(--error);
+}
+
+.console {
+    flex: 1;
+    background: var(--console-bg);
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--console-text);
+    overflow-y: auto;
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure console content isn't covered by the sticky input area */
+.console {
+    padding-bottom: 140px;
+}
+
+.stdin-container {
+    display: none;
+    /* Hidden unless input requested */
+    background: var(--console-bg);
+    padding: 12px 14px;
+    border-radius: 0 0 20px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    align-items: center;
+    gap: 12px;
+}
+
+.stdin-container.active {
+    display: flex;
+    animation: slideUp 0.3s ease-out;
+    position: sticky;
+    bottom: 0;
+    z-index: 1400;
+}
+
+/* Ensure stdin controls remain visible when console is expanded (mobile) */
+.app-shell.show-console .stdin-container {
+    display: flex !important;
+    position: sticky;
+    bottom: 0;
+    z-index: 1400;
+    background: var(--console-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Prevent console content from being covered by mobile keyboards */
+.app-shell.show-console .output-panel {
+    min-height: calc(100vh - 160px);
+}
+
+.stdin-prompt {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--console-text);
+    white-space: nowrap;
+}
+
+#stdin-field {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--console-text);
+    font-family: 'Fira Code', monospace;
+    font-size: 15px;
+    outline: none;
+    padding: 12px 12px;
+    min-height: 140px;
+    resize: vertical;
+    border-radius: 8px;
+    width: 100%;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25);
+    line-height: 1.4;
+}
+
+#stdin-send,
+#stdin-clear {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--accent);
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#stdin-send:hover,
+#stdin-clear:hover {
+    opacity: 0.95
+}
+
+.stdin-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#stdin-toggle-enter {
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--accent);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.stdin-queued {
+    font-family: 'Fira Code', monospace;
+    color: var(--accent);
+    font-weight: 800;
+    padding-left: 8px;
+    font-size: 15px;
+}
+
+.log-entry {
+    margin-bottom: 6px;
+}
+
+.log-entry.system {
+    color: #818cf8;
+    font-style: italic;
+}
+
+.log-entry.error {
+    color: #fca5a5;
+}
+
+.log-entry.output {
+    color: #6ee7b7;
+}
+
+/* Bottom Bar / Button */
+.bottom-bar {
+    padding-bottom: 8px;
+}
+
+.run-button {
+    width: 100%;
+    height: 60px;
+    background: var(--accent);
+    border: none;
+    border-radius: 18px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.btn-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.play-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0%;
+    height: 0%;
+    background: white;
+    opacity: 0.2;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s, opacity 0.6s;
+}
+
+.run-button:hover .btn-glow {
+    width: 250%;
+    height: 500%;
+    opacity: 0;
+}
+
+.run-button:active {
+    transform: scale(0.97);
+}
+
+.run-button:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    color: #64748b;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.console::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Adaptations */
+@media (max-width: 480px) {
+    .app-shell {
+        padding: 12px;
+    }
+
+    .main-content {
+        gap: 12px;
+    }
+
+    .brand h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Make stdin and console layout mobile-friendly */
+    .stdin-container {
+        padding: 12px;
+        gap: 8px;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #stdin-field {
+        min-height: 180px;
+        font-size: 16px;
+    }
+
+    .stdin-controls {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    #stdin-send,
+    #stdin-clear,
+    #stdin-toggle-enter {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .stdin-queued {
+        text-align: right;
+        width: 100%;
+    }
+}
