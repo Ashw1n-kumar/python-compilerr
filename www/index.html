@@ -4,152 +4,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyCompiler - Multi-Language IDE</title>
-    <!-- Modern Typeface: Outfit for display, Fira Code for Mono -->
+    <title>PyCompiler - Python IDE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <!-- Load Pyodide locally -->
+    <!-- Pyodide for running Python in the browser -->
     <script src="pyodide/pyodide.js"></script>
 </head>
 
 <body>
-    <div class="glass-bg"></div>
-    <div class="app-shell anim-fade-in">
-        <header class="top-nav">
+    <div class="app">
+
+        <!-- ── TOP BAR ── -->
+        <header class="top-bar">
+            <!-- Logo button: TAP = open drawer, SWIPE DOWN = switch language -->
             <div class="brand">
-                <button id="btn-logo" class="logo-btn" title="Files">
-                    <img src="img/python.webp" alt="Logo" class="app-logo">
+                <button id="btn-logo" class="logo-btn" title="Tap for menu / Swipe down to switch language">
+                    <img id="lang-logo" src="img/python.webp" alt="Language Logo" class="lang-logo">
                 </button>
-                <h2>Python</h2>
+                <span id="lang-name">Python</span>
             </div>
 
-            <div id="engine-status" class="engine-badge loading">
-                <div class="shimmer"></div>
+            <!-- Engine Status -->
+            <div id="engine-badge" class="engine-badge loading">
                 <span class="dot"></span>
-                <span class="status-text">Booting Engine</span>
+                <span id="engine-text">Loading...</span>
             </div>
         </header>
 
-        <main class="main-content">
-            <!-- File drawer (hidden by default) -->
-            <aside id="file-drawer" class="file-drawer">
-                <div class="drawer-header">
-                    <h3>Saved Scripts</h3>
-                    <button id="drawer-close" class="text-link">Close</button>
-                </div>
-                <div class="drawer-actions">
-                    <button id="drawer-open-files" class="text-link">Open Files</button>
-                    <button id="drawer-help" class="text-link">Help / Snippets</button>
-                    <button id="drawer-dark-toggle" class="text-link">Dark Mode</button>
-                </div>
-                <div id="drawer-list" class="drawer-list"></div>
-                <div id="drawer-preview" class="drawer-preview">
-                    <div class="preview-header">
-                        <strong id="preview-name">Select a file</strong>
-                        <div class="preview-actions">
-                            <button id="preview-load" class="text-link">Load</button>
-                            <button id="preview-run" class="text-link">Run</button>
-                            <button id="preview-delete" class="text-link">Delete</button>
-                            <button id="preview-download" class="text-link">Download</button>
-                        </div>
-                    </div>
-                    <pre id="preview-code" class="preview-code">No file selected</pre>
-                </div>
-            </aside>
-            <div class="editor-glass anim-slide-up">
-                <div class="editor-header">
-                    <div class="file-name">
-                        <svg class="file-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L4 5v14l8 3 8-3V5l-8-3zm0 2.2l6 2.2V18l-6 2.2-6-2.2V6.4l6-2.2z" />
-                        </svg>
-                        <span id="current-filename">untitled.py</span>
-                    </div>
-                    <div class="editor-actions">
-                        <div class="script-controls">
-                            <input id="script-name" type="text" placeholder="Enter file name (e.g. hello.py)" />
-                            <button id="btn-save" class="save-btn">Save</button>
-                        </div>
-                        <button id="btn-new" class="icon-btn" title="New Script">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M12 5v14M5 12h14" />
-                            </svg>
-                        </button>
-                        <button id="btn-clear" class="icon-btn" title="Clear All">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
-                            </svg>
-                        </button>
+        <!-- ── SLIDE-IN FILE DRAWER ── -->
+        <!-- Opens when user taps the logo. Contains menu options. -->
+        <aside id="file-drawer" class="file-drawer">
+            <div class="drawer-header">
+                <h3>Menu</h3>
+                <button id="drawer-close" class="btn-link close-btn">✕ Close</button>
+            </div>
+
+            <!-- Menu options -->
+            <div class="drawer-menu">
+                <button id="drawer-open-files" class="drawer-menu-btn">📂 Open Files</button>
+                <button id="drawer-help"       class="drawer-menu-btn">💡 Help / Snippets</button>
+                <button id="drawer-dark-toggle" class="drawer-menu-btn">🌙 Toggle Dark Mode</button>
+            </div>
+
+            <!-- File list (shown when user taps Open Files) -->
+            <div id="drawer-file-list" class="drawer-file-list"></div>
+
+            <!-- File preview (shown when a file is selected) -->
+            <div id="drawer-preview" class="drawer-preview">
+                <div class="preview-header">
+                    <strong id="preview-name">Select a file</strong>
+                    <div class="preview-actions" id="preview-actions">
+                        <button id="preview-load"     class="btn-link">Load</button>
+                        <button id="preview-run"      class="btn-link">Run</button>
+                        <button id="preview-delete"   class="btn-link close-btn">Delete</button>
+                        <button id="preview-download" class="btn-link">Download</button>
                     </div>
                 </div>
-                <div class="editor-body">
-                    <div id="line-numbers" class="line-numbers">1</div>
-                    <div class="editor-container">
-                        <pre id="highlight-layer" aria-hidden="true"></pre>
-                        <textarea id="code-editor" spellcheck="false" placeholder="write your code here.."></textarea>
-                    </div>
+                <pre id="preview-code" class="preview-code">No file selected</pre>
+            </div>
+        </aside>
+
+        <!-- ── EDITOR AREA ── -->
+        <main class="editor-wrap">
+            <!-- Toolbar: filename input + save + new + clear -->
+            <div class="toolbar">
+                <div class="file-info">
+                    <span id="current-file">untitled.py</span>
+                </div>
+                <div class="toolbar-actions">
+                    <input id="file-name-input" type="text" placeholder="file name (e.g. hello.py)" />
+                    <button id="btn-save" class="btn-primary">Save</button>
+                    <button id="btn-new" class="btn-icon" title="New file">＋</button>
+                    <button id="btn-clear" class="btn-icon" title="Clear editor">🗑</button>
+                    <button id="btn-files" class="btn-icon" title="Saved files">📂</button>
                 </div>
             </div>
 
-            <div id="output-panel" class="output-panel">
-                <div class="panel-header">
-                    <h3>CONSOLE</h3>
-                    <div class="header-right">
-                        <button id="btn-clear-output" class="text-link">Clear Log</button>
-                        <button id="btn-close-output" class="text-link close-console">Close</button>
-                    </div>
-                </div>
-                <div id="output-terminal" class="console">
-                    <div class="log-entry system">Initializing high-performance runtime...</div>
-                </div>
-                <div id="stdin-area" class="stdin-container">
-                    <div class="stdin-prompt">INPUT:</div>
-                    <textarea id="stdin-field" placeholder="Type lines here. Press Ctrl+Enter to send."
-                        autocomplete="off"></textarea>
-                    <div class="stdin-controls">
-                        <button id="stdin-send" class="text-link">Send</button>
-                        <button id="stdin-clear" class="text-link">Clear</button>
-                        <button id="stdin-toggle-enter" class="text-link">Enter=Send: Off</button>
-                        <div id="stdin-queued" class="stdin-queued">Queued: <span id="stdin-count">0</span></div>
-                    </div>
+            <!-- Code Editor with line numbers -->
+            <div class="editor-box">
+                <div id="line-numbers" class="line-numbers">1</div>
+                <div class="editor-inner">
+                    <pre id="highlight-layer" aria-hidden="true"></pre>
+                    <textarea id="code-editor" spellcheck="false" autocorrect="off" autocapitalize="off"
+                        placeholder="write your code here.."></textarea>
                 </div>
             </div>
         </main>
 
-        <footer class="bottom-bar anim-slide-up" style="animation-delay: 0.2s;">
-            <button id="btn-run" class="run-button" disabled>
-                <div class="btn-content">
-                    <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>EXECUTE CODE</span>
-                </div>
-                <div class="btn-glow"></div>
+        <!-- ── RUN BUTTON ── -->
+        <footer class="bottom-bar">
+            <button id="btn-run" class="btn-run" disabled>
+                ▶ &nbsp;RUN
             </button>
         </footer>
-    </div>
 
-    <!-- Help Modal -->
-    <div id="help-modal" class="modal">
-        <div class="modal-content anim-slide-up">
+        <!-- ── OUTPUT CONSOLE ── -->
+        <div id="output-panel" class="output-panel hidden">
+            <div class="console-header">
+                <span>CONSOLE</span>
+                <div>
+                    <button id="btn-clear-output" class="btn-link">Clear</button>
+                    <button id="btn-close-output" class="btn-link close-btn">✕ Close</button>
+                </div>
+            </div>
+            <div id="terminal" class="terminal"></div>
+
+            <!-- Stdin area (shown when program needs input) -->
+            <div id="stdin-area" class="stdin-area">
+                <span class="stdin-label">INPUT:</span>
+                <textarea id="stdin-field" placeholder="Enter input here. Ctrl+Enter to send."></textarea>
+                <div class="stdin-buttons">
+                    <button id="stdin-send" class="btn-link">Send</button>
+                    <button id="stdin-clear" class="btn-link">Clear</button>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div><!-- end .app -->
+
+    <!-- Snippets / Help Modal -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-box">
             <div class="modal-header">
-                <h3 id="help-title">MYCompiler Snippets</h3>
-                <button id="close-help" class="icon-btn">&times;</button>
+                <span id="help-title">Snippets</span>
+                <button id="close-help" class="btn-link close-btn">✕</button>
             </div>
-            <div id="help-body" class="modal-body">
-                <!-- Snippets will be injected here -->
-            </div>
+            <div id="help-body" class="modal-body"></div>
         </div>
     </div>
 
-    <!-- Notification system -->
-    <div id="toast-container"></div>
+    <!-- Toast notifications -->
+    <div id="toast" class="toast hidden"></div>
 
     <script src="js/script.js"></script>
 </body>
